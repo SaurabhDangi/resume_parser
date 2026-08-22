@@ -1,3 +1,5 @@
+from typing import Annotated
+from fastapi.openapi.utils import get_openapi
 from fastapi import FastAPI, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
 from pypdf import PdfReader
@@ -201,10 +203,12 @@ Rules:
 
 from typing import List
 
+from fastapi import FastAPI, UploadFile, File, Form
+
 @app.post("/rank-resumes")
 async def rank_resumes(
-    files: List[UploadFile] = File(...),
-    hr_requirements: str = Form(...)
+    files: Annotated[list[UploadFile], File()],
+    hr_requirements: Annotated[str, Form()]
 ):
 
     results = []
@@ -319,3 +323,22 @@ Rules:
         "total_candidates": len(results),
         "rankings": results
     }
+# Custom OpenAPI schema
+def custom_openapi():
+    if app.openapi_schema:
+        return app.openapi_schema
+
+    schema = get_openapi(
+        title="Resume Ranker API",
+        version="1.0.0",
+        routes=app.routes,
+    )
+
+    # your custom schema code here
+
+    app.openapi_schema = schema
+
+    return app.openapi_schema
+
+
+app.openapi = custom_openapi

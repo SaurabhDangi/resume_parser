@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>AI Resume Ranker</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f6f8;
+            color: #222;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 42px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 18px;
+            color: #666;
+        }
+
+        .card {
+            background: white;
+            padding: 35px;
+            border-radius: 18px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 12px;
+        }
+
+        input[type="file"] {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            margin-bottom: 25px;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 150px;
+            padding: 15px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            font-size: 16px;
+            resize: vertical;
+            margin-bottom: 20px;
+        }
+
+        button {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 10px;
+            background: #2563eb;
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #1d4ed8;
+        }
+
+        #status {
+            text-align: center;
+            font-size: 17px;
+            margin-top: 20px;
+            font-weight: bold;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .candidate {
+            border: 1px solid #ddd;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            background: #fafafa;
+        }
+
+        .candidate h3 {
+            margin-top: 0;
+            font-size: 22px;
+        }
+
+        .match {
+            font-size: 30px;
+            font-weight: bold;
+            color: #2563eb;
+        }
+
+        .score-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .score-box {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+        }
+
+        .score-box strong {
+            display: block;
+            font-size: 20px;
+            margin-top: 5px;
+        }
+
+        .skills {
+            margin-top: 15px;
+        }
+
+        .skills p {
+            line-height: 1.6;
+        }
+
+        .rank {
+            display: inline-block;
+            background: #111827;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 6px;
+            margin-right: 8px;
+        }
+
+        @media (max-width: 600px) {
+
+            .container {
+                margin: 20px auto;
+                padding: 15px;
+            }
+
+            .card {
+                padding: 20px;
+            }
+
+            .header h1 {
+                font-size: 32px;
+            }
+
+            .score-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+    <div class="container">
+
+        <!-- Header -->
+
+        <div class="header">
+
+            <h1>🎯 AI Resume Ranker</h1>
+
+            <p>
+                Compare and rank multiple resumes
+                against HR requirements using AI
+            </p>
+
+        </div>
+
+
+        <!-- Upload Card -->
+
+        <div class="card">
+
+            <label for="resumes">
+                Upload Resumes
+            </label>
+
+            <input
+                type="file"
+                id="resumes"
+                accept=".pdf,.docx"
+                multiple
+            >
+
+            <label for="requirements">
+                HR Requirements
+            </label>
+
+            <textarea
+                id="requirements"
+                placeholder="Example:
+
+Python
+SQL
+FastAPI
+REST API
+Git
+2 years experience
+Bachelor's degree"
+            ></textarea>
+
+
+            <button id="analyzeBtn">
+                Analyze & Rank Resumes
+            </button>
+
+
+            <p id="status"></p>
+
+        </div>
+
+
+        <!-- Results -->
+
+        <div
+            id="result"
+            class="card hidden"
+        >
+
+        </div>
+
+    </div>
+
+
+    <!-- JavaScript -->
+
+    <script src="script.js"></script>
+
+</body>
+
+</html>

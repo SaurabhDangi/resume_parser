@@ -1,4 +1,17 @@
+# Virtual environments
 .venv/
+venv/
+**/.venv/
+**/venv/
+
+# API keys
 .env
+**/.env
+
+# Python cache
 __pycache__/
+**/__pycache__/
 *.pyc
+
+# VS Code
+.vscode/
