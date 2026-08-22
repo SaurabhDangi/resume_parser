@@ -199,9 +199,11 @@ Rules:
     "summary": result.summary
     }
 
+from typing import List
+
 @app.post("/rank-resumes")
 async def rank_resumes(
-    files: list[UploadFile] = File(...),
+    files: List[UploadFile] = File(...),
     hr_requirements: str = Form(...)
 ):
 
