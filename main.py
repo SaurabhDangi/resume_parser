@@ -198,4 +198,122 @@ Rules:
     "skills_missing": result.skills_missing,
     "summary": result.summary
     }
-    
+
+@app.post("/rank-resumes")
+async def rank_resumes(
+    files: list[UploadFile] = File(...),
+    hr_requirements: str = Form(...)
+):
+
+    results = []
+
+    for file in files:
+
+        # Read resume
+        file_bytes = await file.read()
+
+        # Extract text
+        resume_text = extract_text(
+            file_bytes,
+            file.filename
+        )
+
+        # Prompt
+        prompt = f"""
+You are an HR resume screening assistant.
+
+Compare this candidate's resume against the HR requirements.
+
+HR Requirements:
+{hr_requirements}
+
+Candidate Resume:
+{resume_text}
+
+Analyze the candidate in these four categories:
+
+1. skills_match
+2. experience_match
+3. projects_match
+4. education_match
+
+Give each category a score from 0 to 100.
+
+Return ONLY valid JSON:
+
+{{
+    "skills_match": 0,
+    "experience_match": 0,
+    "projects_match": 0,
+    "education_match": 0,
+    "skills_found": [],
+    "skills_missing": [],
+    "summary": ""
+}}
+
+Rules:
+
+- Each score must be between 0 and 100.
+- skills_found = required skills found in the resume.
+- skills_missing = required skills not found.
+- Do not invent experience.
+- Do not invent skills.
+- summary should briefly explain the candidate's suitability.
+"""
+
+        # Groq
+        response = client.chat.completions.create(
+            model=model,
+            messages=[
+                {
+                    "role": "user",
+                    "content": prompt
+                }
+            ],
+            response_format={
+                "type": "json_object"
+            }
+        )
+
+        answer = response.choices[0].message.content
+
+        # JSON
+        data = json.loads(answer)
+
+        # Pydantic
+        result = ResumeResult(**data)
+
+        # Calculate score
+        final_score = (
+            result.skills_match * 0.40
+            + result.experience_match * 0.25
+            + result.projects_match * 0.20
+            + result.education_match * 0.15
+        )
+
+        results.append({
+            "filename": file.filename,
+            "match_percentage": round(final_score),
+            "skills_match": result.skills_match,
+            "experience_match": result.experience_match,
+            "projects_match": result.projects_match,
+            "education_match": result.education_match,
+            "skills_found": result.skills_found,
+            "skills_missing": result.skills_missing,
+            "summary": result.summary
+        })
+
+    # Sort highest score first
+    results.sort(
+        key=lambda x: x["match_percentage"],
+        reverse=True
+    )
+
+    # Add rank
+    for index, result in enumerate(results, start=1):
+        result["rank"] = index
+
+    return {
+        "total_candidates": len(results),
+        "rankings": results
+    }
